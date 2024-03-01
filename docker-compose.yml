@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  bot_task_reward_postgres:
+    container_name: bot_task_reward_postgres
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_USER:  ${DB_USER:-admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+      POSTGRES_DB: ${DB_NAME:-bot_task_reward}
+    volumes:
+      - ./postgresql_data:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT:-5432}:5432"
+  
+  bot_task_reward_pgadmin:
+    container_name: bot_task_reward_pgadmin
+    image: dpage/pgadmin4:7
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@email.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-password}
+    ports:
+      - ${PGADMIN_PORT:-8085}:80
