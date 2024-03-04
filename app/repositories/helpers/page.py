@@ -13,4 +13,4 @@ def build_page(model: Type[T], query: Query, filter: BaseFilter) -> Page[T]:
     
     elements = [model.model_validate(e) for e in elements]
 
-    return Page[model].get_page(elements, filter.page, filter.page_size, count)
+    return Page[model].get_page(elements, filter, count)
