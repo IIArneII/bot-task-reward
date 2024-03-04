@@ -26,27 +26,27 @@ def upgrade() -> None:
 
     op.create_table(
         'tasks',
+        sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('type', sa.Enum('base', name='task_type'), server_default='base', nullable=False),
         sa.Column('link', sa.String(), nullable=False),
         sa.Column('description', sa.String(), nullable=True),
         sa.Column('points', sa.Integer(), server_default='0', nullable=False),
-        sa.Column('deleted_at', sa.DateTime(), nullable=True),
-        sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('created_at', sa.DateTime(), nullable=False),
         sa.Column('updated_at', sa.DateTime(), nullable=False),
+        sa.Column('deleted_at', sa.DateTime(), nullable=True),
         sa.PrimaryKeyConstraint('id'),
         sa.CheckConstraint('points >= 0')
     )
 
     op.create_table(
         'users',
+        sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('email', sa.String(), nullable=False),
         sa.Column('role', sa.Enum('member', 'admin', name='role'), server_default='member', nullable=False),
         sa.Column('balance', sa.Integer(), server_default='0', nullable=False),
-        sa.Column('deleted_at', sa.DateTime(), nullable=True),
-        sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('created_at', sa.DateTime(), nullable=False),
         sa.Column('updated_at', sa.DateTime(), nullable=False),
+        sa.Column('deleted_at', sa.DateTime(), nullable=True),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('email'),
         sa.CheckConstraint('balance >= 0')
@@ -54,12 +54,12 @@ def upgrade() -> None:
 
     op.create_table(
         'user_tasks',
+        sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('user_id', sa.Integer(), nullable=False),
         sa.Column('task_id', sa.Integer(), nullable=False),
         sa.Column('points', sa.Integer(), nullable=False),
         sa.Column('status', sa.Enum('started', 'completed', 'not_completed', name='tasks_tatus'), server_default='started', nullable=False),
         sa.Column('checked_at', sa.DateTime(), nullable=True),
-        sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('created_at', sa.DateTime(), nullable=False),
         sa.Column('updated_at', sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(['task_id'], ['tasks.id'], ),
