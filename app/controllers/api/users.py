@@ -5,7 +5,7 @@ from app.controllers.api.helpers.services_providers import users_service
 from app.controllers.api.helpers.profile import Profile
 from app.controllers.api.helpers.filters import user_filter
 from app.services.users import UsersService
-from app.services.models.users import UserRegister, UserEntity, UserFilter
+from app.services.models.users import UserRegister, User, UserFilter
 from app.services.models.base import Page, BaseFilter
 
 
@@ -16,7 +16,7 @@ users_api = APIRouter(
 
 
 @users_api.post('/register', responses= OK | BAD_REQUEST)
-def register(model: UserRegister, users_service: UsersService = Depends(users_service)) -> UserEntity:
+def register(model: UserRegister, users_service: UsersService = Depends(users_service)) -> User:
     '''
     Register of a new client
     '''
@@ -24,7 +24,7 @@ def register(model: UserRegister, users_service: UsersService = Depends(users_se
 
 
 @users_api.get('/me', responses= OK | FORBIDDEN)
-def get_me(profile: UserEntity = Depends(Profile()), users_service: UsersService = Depends(users_service)) -> UserEntity:
+def get_me(profile: User = Depends(Profile()), users_service: UsersService = Depends(users_service)) -> User:
     '''
     Get yourself
     '''
@@ -32,7 +32,7 @@ def get_me(profile: UserEntity = Depends(Profile()), users_service: UsersService
 
 
 @users_api.get("", responses= OK)
-def get_list(filter: UserFilter = Depends(user_filter), users_service: UsersService = Depends(users_service)) -> Page[UserEntity]:
+def get_list(filter: UserFilter = Depends(user_filter), users_service: UsersService = Depends(users_service)) -> Page[User]:
     '''
     Get users list
     '''    
@@ -40,7 +40,7 @@ def get_list(filter: UserFilter = Depends(user_filter), users_service: UsersServ
 
 
 @users_api.get('/{id}', responses= OK | NOT_FOUND)
-def get(id: int, users_service: UsersService = Depends(users_service)) -> UserEntity:
+def get(id: int, users_service: UsersService = Depends(users_service)) -> User:
     '''
     Get user by ID
     '''

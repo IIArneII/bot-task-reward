@@ -20,10 +20,10 @@ import app.db.models.user_task
 
 
 class DataBase:
-    def __init__(self, config: dict) -> None:
+    def __init__(self, config: dict | DBConfig, ping: bool = True) -> None:
         logger.info(f'Init data base')
         
-        self._config = DBConfig(config)
+        self._config = config if type(config) is DBConfig else DBConfig(config)
         self._engine = create_engine(self._config.dsn(), pool_pre_ping=True)
         self._session_factory = scoped_session(sessionmaker(
             autocommit=False,
@@ -33,17 +33,18 @@ class DataBase:
 
         Base.metadata.bind = self._engine
 
-        self.ping()
+        if ping:
+            self.ping()
 
         if self._config.APPLY_MIGRATIONS:
-            self._apply_migrations()
+            self.apply_migrations()
 
-    def _apply_migrations(self) -> None:
+    def apply_migrations(self) -> None:
         logger.info('Apply migrations')
         
         alembic_cfg = Config(self._config.ALEMBIC_INI_PATH)
-        configuration = alembic_cfg.get_section(alembic_cfg.config_ini_section, {})
-        configuration["sqlalchemy.url"] = self._config.dsn()
+        alembic_cfg.set_section_option(alembic_cfg.config_ini_section, 'sqlalchemy.url', self._config.dsn())
+
         command.upgrade(alembic_cfg, "head")
 
     def ping(self):
@@ -56,7 +57,7 @@ class DataBase:
         session: Session = self._session_factory()
         try:
             yield session
-        except Exception as e:
+        except Exception:
             logger.error('Session rollback because of exception')
             session.rollback()
             raise

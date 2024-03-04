@@ -23,7 +23,6 @@ from app.db.db import Base
 from app.config import DBConfig
 
 target_metadata = Base.metadata
-url = DBConfig().dsn()
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -43,6 +42,11 @@ def run_migrations_offline() -> None:
     script output.
 
     """
+    configuration = config.get_section(config.config_ini_section, {})
+    url = DBConfig().dsn()
+    if "sqlalchemy.url" in configuration:
+        url = configuration["sqlalchemy.url"]
+
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -62,7 +66,8 @@ def run_migrations_online() -> None:
 
     """
     configuration = config.get_section(config.config_ini_section, {})
-    configuration["sqlalchemy.url"] = url
+    if "sqlalchemy.url" not in configuration:
+        configuration["sqlalchemy.url"] = DBConfig().dsn()
 
     connectable = engine_from_config(
         configuration,

@@ -18,5 +18,6 @@ The openAPI specification can be viewed by following the path `host:port/api/v1/
 
 
 alembic revision -m "init" --autogenerate
-
 alembic upgrade head
+
+pytest

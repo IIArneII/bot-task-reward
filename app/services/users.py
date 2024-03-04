@@ -1,7 +1,7 @@
 from app.services.models.errors import BadRequestError, NOT_FOUND_ERR
 from app.repositories.users import UsersRepository
 from app.services.helpers.try_except import try_except
-from app.services.models.users import UserEntityCreate, UserRegister, UserEntity, Role, UserFilter
+from app.services.models.users import UserEntityCreate, UserRegister, User, Role, UserFilter
 from app.services.models.base import Page
 
 
@@ -19,11 +19,11 @@ class UsersService:
         return user
     
     @try_except
-    def get_list(self, filter: UserFilter) -> Page[UserEntity]:
+    def get_list(self, filter: UserFilter) -> Page[User]:
         return self._users_repository.get_list(filter)
     
     @try_except
-    def register(self, model: UserRegister) -> UserEntity:
+    def register(self, model: UserRegister) -> User:
         if model.password != model.password_repeat:
             raise BadRequestError('Password mismatch')
         

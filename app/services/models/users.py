@@ -1,36 +1,25 @@
-from app.services.models.base import BaseModel, EntityBaseModel, BaseFilter, Page
+from app.services.models.base import BaseModel, EntityBaseModel, BaseFilter
 from app.services.enums.users import Role
 
-from pydantic import Field, EmailStr
+from pydantic import EmailStr
 
 
-class UserEntity(EntityBaseModel):
-    username: str
+class User(EntityBaseModel):
     email: EmailStr
-    name: str
     role: Role
+    balance: int
 
 
 class UserFilter(BaseFilter):
-    username: str | None = None
     email: str | None = None
 
 
-class UserEntityWithPassword(UserEntity):
-    password_hash: str
-
-
-class UserEntityCreate(BaseModel):
-    username: str
+class UserCreate(BaseModel):
+    id: int
     email: EmailStr
-    name: str
-    role: Role
-    password_hash: str
 
 
-class UserRegister(BaseModel):
-    username: str
-    email: EmailStr
-    name: str
-    password: str = Field(min_length=8)
-    password_repeat: str = Field(min_length=8)
+class UserUpdate(BaseModel):
+    email: EmailStr | None = None
+    role: Role | None = None
+    balance: int | None = None
