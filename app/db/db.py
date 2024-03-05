@@ -15,13 +15,11 @@ Base: BaseModel = declarative_base()
 from app.config import DBConfig
 import app.db.models.base
 import app.db.models.user
-import app.db.models.task
-import app.db.models.user_task
 
 
 class DataBase:
     def __init__(self, config: dict | DBConfig, ping: bool = True) -> None:
-        logger.info(f'Init data base')
+        logger.info(f'Init data base...')
         
         self._config = config if type(config) is DBConfig else DBConfig(config)
         self._engine = create_engine(self._config.dsn(), pool_pre_ping=True)
@@ -40,7 +38,7 @@ class DataBase:
             self.apply_migrations()
 
     def apply_migrations(self) -> None:
-        logger.info('Apply migrations')
+        logger.info('Apply migrations...')
         
         alembic_cfg = Config(self._config.ALEMBIC_INI_PATH)
         alembic_cfg.set_section_option(alembic_cfg.config_ini_section, 'sqlalchemy.url', self._config.dsn())
@@ -48,7 +46,7 @@ class DataBase:
         command.upgrade(alembic_cfg, "head")
 
     def ping(self):
-        logger.info('Ping data base')
+        logger.info('Ping data base...')
 
         with self._engine.connect() as _: ...
 

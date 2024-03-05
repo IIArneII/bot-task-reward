@@ -1,23 +1,15 @@
-from fastapi import FastAPI
-from uvicorn import run
+from asyncio import run
+from loguru import logger
 
 from app.app import create_app
 from app.config import Config
 
 
-app: FastAPI | None = None
-
-
-def main(config: Config):
-    global app
-    app = create_app(config)
-
-
-if __name__ == 'main':
-    main(Config())
+async def main(config: Config):
+    bot, dp = await create_app(config)
+    logger.info('Running the app...')
+    await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
 
 
 if __name__ == '__main__':
-    config = Config()
-    main(config)
-    run(app, host=config.app.HOST, port=config.app.PORT)
+    run(main(Config()))

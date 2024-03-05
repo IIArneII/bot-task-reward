@@ -1,25 +1,15 @@
-from app.services.models.base import BaseModel, EntityBaseModel, BaseFilter
-from app.services.enums.users import Role
-
-from pydantic import EmailStr
+from app.services.models.base import BaseModel, EntityBaseModel
 
 
 class User(EntityBaseModel):
-    email: EmailStr
-    role: Role
     balance: int
-
-
-class UserFilter(BaseFilter):
-    email: str | None = None
+    tasks: list[str]
 
 
 class UserCreate(BaseModel):
     id: int
-    email: EmailStr
 
 
 class UserUpdate(BaseModel):
-    email: EmailStr | None = None
-    role: Role | None = None
     balance: int | None = None
+    tasks: list[str] | None = None

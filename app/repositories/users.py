@@ -1,6 +1,5 @@
 from app.db.models.user import User as UserDB
-from app.services.models.users import User, UserCreate, UserUpdate, UserFilter
-from app.services.enums.users import Role
+from app.services.models.users import User, UserCreate, UserUpdate
 from app.services.models.base import Page
 from app.services.models.errors import ALREADY_EXISTS
 from app.repositories.helpers.page import build_page
@@ -17,34 +16,9 @@ class UsersRepository:
         self._get_session = get_session
 
 
-    def get_list(self, filter: UserFilter) -> Page[User]:
-        with self._get_session() as session:
-            q = session.query(UserDB).where(UserDB.deleted_at == None)
-            
-            if filter.email:
-                q = q.where(UserDB.email.ilike(f'%{filter.email}%'))
-            
-            q = q.order_by(UserDB.id.asc())
-
-            return build_page(User, q, filter)
-
-
     def get(self, id: int) -> User | None:
         with self._get_session() as session:
-            user = session.query(UserDB).where(
-                (UserDB.id == id) &
-                (UserDB.deleted_at == None)
-            ).first()
-
-            return User.model_validate(user) if user else None
-
-
-    def get_by_email(self, email: str) -> User | None:
-        with self._get_session() as session:
-            user = session.query(UserDB).where(
-                (UserDB.email == email) &
-                (UserDB.deleted_at == None)
-            ).first()
+            user = session.query(UserDB).where(UserDB.id == id).first()
 
             return User.model_validate(user) if user else None
 
@@ -65,22 +39,16 @@ class UsersRepository:
     def update(self, id: int, model: UserUpdate) -> User | None:
         try:
             with self._get_session() as session:
-                user = session.query(UserDB).where(
-                    (UserDB.id == id) &
-                    (UserDB.deleted_at == None)
-                ).first()
+                user = session.query(UserDB).where(UserDB.id == id).first()
 
                 if user is None:
                     return None
-            
-                if type(model.email) is str:
-                    user.email = model.email
-                
-                if type(model.role) is str:
-                    user.role = model.role
                 
                 if type(model.balance) is int:
                     user.balance = model.balance
+                
+                if type(model.tasks) is list:
+                    user.tasks = model.tasks
 
                 user.updated_at = datetime.now(timezone.utc)
 
@@ -90,21 +58,3 @@ class UsersRepository:
 
         except IntegrityError:
             raise ALREADY_EXISTS
-
-
-    def delete(self, id: int) -> bool:
-        with self._get_session() as session:
-            user = session.query(UserDB).where(
-                (UserDB.id == id) &
-                (UserDB.deleted_at == None)
-            ).first()
-
-            if not user:
-                return False
-            
-            time = datetime.now(timezone.utc)
-            user.deleted_at = time
-            user.updated_at = time
-            session.commit()
-
-            return True
