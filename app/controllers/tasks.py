@@ -1,20 +1,15 @@
 from aiogram import Router, F
 from aiogram.types import Message
-from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types.callback_query import CallbackQuery
 from loguru import logger
-from asyncio import sleep
 
-from app.controllers.keyboards.menu import menu_kb, back_to_menu_kb
+from app.controllers.keyboards.menu import back_to_menu_kb
 from app.controllers.keyboards.tasks import tasks_kb, back_to_tasks_kb, check_kb
-from app.controllers.messages.menu import menu_msg, info_msg
 from app.controllers.messages.tasks import tasks_msg, task_msg, task_successful_user_name_msg, task_failed_user_name_msg, successful_check_msg, failed_check_msg
 from app.controllers.messages.error import error_msg
 from app.controllers.states.completing_task import CompletingTask
-from app.services.users import UsersService
 from app.services.tasks import TasksService
-from app.services.models.users import UserCreate
 from app.container import get_container
 
 
@@ -62,8 +57,11 @@ async def user_name(message: Message, state: FSMContext):
 
         check = tasks_service.check_user_name(message.from_user.id, data['task_id'], message.text)
         if not check:
+            logger.info(f'Failed user name check. User id: {message.from_user.id}. Task: {data['task_id']}. User name: {message.text}')
             await message.answer(task_failed_user_name_msg(task), reply_markup=back_to_tasks_kb)
 
+        logger.info(f'Successful user name check. User id: {message.from_user.id}. Task: {data['task_id']}. User name: {message.text}')
+        
         await state.update_data(user_name=message.text)
         await state.set_state(CompletingTask.execution_process)
 
@@ -87,8 +85,10 @@ async def check(clbck: CallbackQuery, state: FSMContext):
         check = tasks_service.check_execution(clbck.from_user.id, data['task_id'], data['user_name'])
         
         if check:
+            logger.info(f'Successful execution check. User id: {clbck.from_user.id}. Task: {data['task_id']}. User name: {data['user_name']}')
             await clbck.message.answer(successful_check_msg(task), reply_markup=back_to_menu_kb)
         else:
+            logger.info(f'Failed execution check. User id: {clbck.from_user.id}. Task: {data['task_id']}. User name: {data['user_name']}')
             await clbck.message.answer(failed_check_msg(), reply_markup=back_to_menu_kb)
     
     except Exception as e:
