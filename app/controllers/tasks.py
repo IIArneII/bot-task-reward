@@ -27,6 +27,7 @@ async def task_list(clbck: CallbackQuery, state: FSMContext):
         await clbck.message.answer(tasks_msg(), reply_markup=tasks_kb(tasks))
     
     except Exception as e:
+        logger.exception(e)
         await clbck.message.answer(error_msg(str(e)), reply_markup=back_to_menu_kb)
 
 
@@ -45,6 +46,7 @@ async def task(clbck: CallbackQuery, state: FSMContext):
         await clbck.message.answer(task_msg(task), reply_markup=back_to_tasks_kb)
     
     except Exception as e:
+        logger.exception(e)
         await clbck.message.answer(error_msg(str(e)), reply_markup=back_to_menu_kb)
 
 
@@ -55,21 +57,24 @@ async def user_name(message: Message, state: FSMContext):
 
         data = await state.get_data()
 
-        check = tasks_service.check_user_name(message.from_user.id, data['task_id'], message.text)
-        if not check:
-            logger.info(f'Failed user name check. User id: {message.from_user.id}. Task: {data['task_id']}. User name: {message.text}')
-            await message.answer(task_failed_user_name_msg(task), reply_markup=back_to_tasks_kb)
+        task_id = data['task_id']
+        check = tasks_service.check_user_name(message.from_user.id, task_id, message.text)
+        task = tasks_service.get(message.from_user.id, task_id)
 
-        logger.info(f'Successful user name check. User id: {message.from_user.id}. Task: {data['task_id']}. User name: {message.text}')
+        if not check:
+            logger.info(f'Failed user name check. User id: {message.from_user.id}. Task: {task_id}. User name: {message.text}')
+            await message.answer(task_failed_user_name_msg(task), reply_markup=back_to_tasks_kb)
+            return
+
+        logger.info(f'Successful user name check. User id: {message.from_user.id}. Task: {task_id}. User name: {message.text}')
         
         await state.update_data(user_name=message.text)
         await state.set_state(CompletingTask.execution_process)
 
-        task = tasks_service.get(message.from_user.id, data['task_id'])
-
         await message.answer(task_successful_user_name_msg(task), reply_markup=check_kb)
     
     except Exception as e:
+        logger.exception(e)
         await message.answer(error_msg(str(e)), reply_markup=back_to_menu_kb)
 
 
@@ -81,15 +86,18 @@ async def check(clbck: CallbackQuery, state: FSMContext):
         data = await state.get_data()
         await state.clear()
         
-        task = tasks_service.get(clbck.from_user.id, data['task_id'])
-        check = tasks_service.check_execution(clbck.from_user.id, data['task_id'], data['user_name'])
+        task_id = data['task_id']
+        user_name = data['user_name']
+        task = tasks_service.get(clbck.from_user.id, task_id)
+        check = tasks_service.check_execution(clbck.from_user.id, task_id, user_name)
         
         if check:
-            logger.info(f'Successful execution check. User id: {clbck.from_user.id}. Task: {data['task_id']}. User name: {data['user_name']}')
+            logger.info(f'Successful execution check. User id: {clbck.from_user.id}. Task: {task_id}. User name: {user_name}')
             await clbck.message.answer(successful_check_msg(task), reply_markup=back_to_menu_kb)
         else:
-            logger.info(f'Failed execution check. User id: {clbck.from_user.id}. Task: {data['task_id']}. User name: {data['user_name']}')
+            logger.info(f'Failed execution check. User id: {clbck.from_user.id}. Task: {task_id}. User name: {user_name}')
             await clbck.message.answer(failed_check_msg(), reply_markup=back_to_menu_kb)
     
     except Exception as e:
+        logger.exception(e)
         await clbck.message.answer(error_msg(str(e)), reply_markup=back_to_menu_kb)

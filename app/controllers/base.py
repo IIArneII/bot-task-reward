@@ -3,6 +3,7 @@ from aiogram.types import Message
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types.callback_query import CallbackQuery
+from loguru import logger
 
 from app.controllers.keyboards.menu import menu_kb, back_to_menu_kb
 from app.controllers.messages.menu import menu_msg, info_msg
@@ -25,6 +26,7 @@ async def start(msg: Message):
         await msg.answer(menu_msg(user, msg.from_user.full_name), reply_markup=menu_kb)
 
     except Exception as e:
+        logger.exception(e)
         await msg.answer(error_msg(str(e)))
     
 
@@ -50,4 +52,5 @@ async def menu(clbck: CallbackQuery, state: FSMContext):
         await clbck.message.answer(menu_msg(user, clbck.from_user.full_name), reply_markup=menu_kb)
     
     except Exception as e:
+        logger.exception(e)
         await clbck.message.answer(error_msg(str(e)), reply_markup=back_to_menu_kb)

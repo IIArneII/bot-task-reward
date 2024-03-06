@@ -7,6 +7,9 @@ from app.db.db import DataBase
 from app.repositories.users import UsersRepository
 from app.services.users import UsersService
 from app.services.tasks import TasksService
+from app.infrastructure.social_network import ISocialNetwork
+from app.infrastructure.social_networks.instagram import Instagram
+from app.infrastructure.social_networks.twitter import Twitter
 
 
 class Container(DeclarativeContainer):
@@ -16,8 +19,11 @@ class Container(DeclarativeContainer):
     
     users_repository = Factory(UsersRepository, get_session=db.provided.get_session)
 
+    twitter: ISocialNetwork = Singleton(Twitter)
+    instagram: ISocialNetwork = Singleton(Instagram)
+
     users_service: UsersService = Factory(UsersService, users_repository=users_repository)
-    tasks_service: TasksService = Factory(TasksService, users_repository=users_repository)
+    tasks_service: TasksService = Factory(TasksService, users_repository=users_repository, twitter=twitter, instagram=instagram)
 
 
 container : Container | None = None
