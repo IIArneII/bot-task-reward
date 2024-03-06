@@ -12,21 +12,6 @@ class BotConfig(BaseSettings):
     TOKEN: str = 'bot_token'
 
 
-class APIConfig(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_prefix='API_',
-        env_file='.env',
-        extra='ignore',
-    )
-
-    VERSION: str = '1.0.0'
-    TITLE: str = 'Bot Task Reward API'
-    SUMMARY: str | None = None
-    DESCRIPTION: str = 'API for telegram bot for completing various tasks and getting points'
-    PREFIX: str = '/api'
-    IS_VISIBLE: bool = True
-
-
 class AppConfig(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix='APP_',
@@ -34,8 +19,6 @@ class AppConfig(BaseSettings):
         extra='ignore',
     )
 
-    PORT: int = 80
-    HOST: str = '0.0.0.0'
     DEBUG: bool = False
 
 
@@ -80,7 +63,6 @@ class LogConfig(BaseSettings):
 
 
 class Config(BaseSettings):
-    api: APIConfig = APIConfig()
     app: AppConfig = AppConfig()
     bot: BotConfig = BotConfig()
     db:  DBConfig  = DBConfig()

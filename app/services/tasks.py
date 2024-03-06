@@ -1,7 +1,8 @@
-from app.services.models.errors import NOT_FOUND_ERR
+from app.services.models.errors import NOT_FOUND_ERR, ALREADY_DONE
 from app.repositories.users import UsersRepository
 from app.services.helpers.try_except import try_except
 from app.services.models.tasks import Task, TaskForUser
+from app.services.models.users import UserUpdate
 
 
 tasks = {
@@ -46,7 +47,6 @@ class TasksService:
     @try_except
     def get_list(self, user_id: int) -> list[TaskForUser]:
         user =  self._users_repository.get(user_id)
-
         if user is None:
             raise NOT_FOUND_ERR
         
@@ -60,3 +60,47 @@ class TasksService:
         ) for i, v in tasks.items()]
 
         return tasks_for_user
+
+
+    @try_except
+    def check_user_name(self, user_id: int, id: str, user_name: str) -> bool:
+        task = tasks.get(id)
+        if task is None:
+            raise NOT_FOUND_ERR
+
+        user =  self._users_repository.get(user_id)
+        if user is None:
+            raise NOT_FOUND_ERR
+
+        if id in user.tasks:
+            raise ALREADY_DONE
+        
+        # Проверка наличия логина в списке подписчиков. Должен отсутсвовать
+
+        return True
+
+
+    @try_except
+    def check_execution(self, user_id: int, id: str, user_name: str) -> bool:
+        task = tasks.get(id)
+        if task is None:
+            raise NOT_FOUND_ERR
+
+        user =  self._users_repository.get(user_id)
+        if user is None:
+            raise NOT_FOUND_ERR
+        
+        if id in user.tasks:
+            raise ALREADY_DONE
+        
+        # Проверка наличия логина в списке подписчиков. Должен содержаться
+
+        user = self._users_repository.update(user.id, UserUpdate(
+            balance=user.balance+task.bonuses,
+            tasks=user.tasks+[id]
+        ))
+
+        if task is None:
+            raise NOT_FOUND_ERR
+
+        return True
