@@ -62,8 +62,27 @@ class LogConfig(BaseSettings):
     ROTATION: int = 100
 
 
+class InstagramConfig(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_prefix='SN_INST_',
+        env_file='.env',
+        extra='ignore',
+        use_enum_values=True,
+    )
+
+    USERNAME: str = 'username'
+    PASSWORD: str = 'password'
+    CHECK_USERNAME: str = ''
+    SETTINGS_PATH: str = './social_networks_temp/instagram_settings.json'
+
+
+class SNConfig(BaseSettings):
+    instagram: InstagramConfig = InstagramConfig()
+
+
 class Config(BaseSettings):
     app: AppConfig = AppConfig()
     bot: BotConfig = BotConfig()
     db:  DBConfig  = DBConfig()
     log: LogConfig = LogConfig()
+    sn: SNConfig = SNConfig()

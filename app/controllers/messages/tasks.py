@@ -42,5 +42,5 @@ def successful_check_msg(task: TaskForUser) -> str:
 
 def failed_check_msg() -> str:
     return f'''
-'Кажется, вы не выполнили задание😞'
+Кажется, вы не выполнили задание😞
 '''
