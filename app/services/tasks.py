@@ -18,7 +18,7 @@ tasks = {
         social_network=SocialNetwork.instagram,
         name='Подписаться на инстаграм',
         description='Вам необходимо подписаться на инстаграм',
-        link='https://www.instagram.com/maxgalkinru',
+        link='https://www.instagram.com/gzed_2001',
         bonuses=10,
     ),
 }
