@@ -19,7 +19,7 @@ class Container(DeclarativeContainer):
     
     users_repository = Factory(UsersRepository, get_session=db.provided.get_session)
 
-    twitter: ISocialNetwork = Singleton(Twitter)
+    twitter: ISocialNetwork = Singleton(Twitter, config=config.sn.twitter)
     instagram: ISocialNetwork = Singleton(Instagram, config=config.sn.instagram)
 
     users_service: UsersService = Factory(UsersService, users_repository=users_repository)
@@ -36,7 +36,8 @@ def init_container(config: Config) -> None:
     container = Container()
     container.config.from_dict(config.model_dump())
     container.db()
-    container.instagram()
+    #container.instagram()
+    container.twitter()
 
 
 def get_container() -> Container:

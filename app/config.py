@@ -76,8 +76,24 @@ class InstagramConfig(BaseSettings):
     SETTINGS_PATH: str = './social_networks_temp/instagram_settings.json'
 
 
+class TwitterConfig(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_prefix='SN_TWIT_',
+        env_file='.env',
+        extra='ignore',
+        use_enum_values=True,
+    )
+
+    CONSUMER_KEY: str = 'consumer_key'
+    CONSUMER_SECRET: str = 'consumer_secret'
+    ACCESS_TOKEN: str = 'access_token'
+    ACCESS_TOKEN_SECRET: str = 'access_token_secret'
+    CHECK_USERNAME: str = ''
+
+
 class SNConfig(BaseSettings):
     instagram: InstagramConfig = InstagramConfig()
+    twitter: TwitterConfig = TwitterConfig()
 
 
 class Config(BaseSettings):
