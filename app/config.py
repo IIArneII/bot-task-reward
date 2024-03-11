@@ -76,8 +76,20 @@ class InstagramConfig(BaseSettings):
     SETTINGS_PATH: str = './social_networks_temp/instagram_settings.json'
 
 
+class TikTokConfig(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_prefix='SN_TIKTOK_',
+        env_file='.env',
+        extra='ignore',
+        use_enum_values=True,
+    )
+
+    CHECK_USERNAME: str = ''
+
+
 class SNConfig(BaseSettings):
     instagram: InstagramConfig = InstagramConfig()
+    tiktok: TikTokConfig = TikTokConfig()
 
 
 class Config(BaseSettings):
