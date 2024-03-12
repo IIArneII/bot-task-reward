@@ -6,7 +6,7 @@ services:
     image: postgres:16
     restart: always
     environment:
-      POSTGRES_USER:  ${DB_USER:-admin}
+      POSTGRES_USER: ${DB_USER:-admin}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
       POSTGRES_DB: ${DB_NAME:-bot_task_reward}
     volumes:
@@ -23,3 +23,24 @@ services:
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-password}
     ports:
       - ${PGADMIN_PORT:-8085}:80
+
+  bot_task_reward:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: bot_task_reward
+    restart: always
+    depends_on:
+      - bot_task_reward_postgres
+    environment:
+      LOG_DIR: ./logs
+      BOT_TOKEN: ${BOT_TOKEN}
+      DB_USER: ${DB_USER:-admin}
+      DB_PASSWORD: ${DB_PASSWORD:-password}
+      DB_NAME: ${DB_NAME:-bot_task_reward}
+      SN_INST_USERNAME: ${SN_INST_USERNAME}
+      SN_INST_PASSWORD: ${SN_INST_PASSWORD}
+      SN_TELEGRAM_CHANNEL: ${SN_TELEGRAM_CHANNEL}
+    volumes:
+      - ${LOG_DIR:-./logs}:/app/logs
+      - ${SOCIAL_NETWORKS_TEMP:-./social_networks_temp}:/app/social_networks_temp

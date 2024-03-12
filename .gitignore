@@ -161,4 +161,5 @@ cython_debug/
 
 logs
 social_networks_temp
+postgresql_data
 .vscode
