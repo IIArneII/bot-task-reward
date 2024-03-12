@@ -15,17 +15,17 @@ class Instagram(ISocialNetwork):
         self._config: InstagramConfig = config if type(config) is InstagramConfig else InstagramConfig(config)
         self._client = Client(logger=logger)
         
-        # if isfile(self._config.SETTINGS_PATH):
-        #     self._client.load_settings(self._config.SETTINGS_PATH)
-        # elif not isdir(dir_name := dirname(self._config.SETTINGS_PATH)):
-        #     mkdir(dir_name)
+        if isfile(self._config.SETTINGS_PATH):
+            self._client.load_settings(self._config.SETTINGS_PATH)
+        elif not isdir(dir_name := dirname(self._config.SETTINGS_PATH)):
+            mkdir(dir_name)
 
-        # if not self._client.login(self._config.USERNAME, self._config.PASSWORD):
-        #     raise AUTHORIZATION_FAILURE
+        if not self._client.login(self._config.USERNAME, self._config.PASSWORD):
+            raise AUTHORIZATION_FAILURE
         
-        # self._client.dump_settings(self._config.SETTINGS_PATH)
+        self._client.dump_settings(self._config.SETTINGS_PATH)
         
-        # self._check_user_id = self._client.user_id_from_username(self._config.CHECK_USERNAME if self._config.CHECK_USERNAME else self._config.USERNAME)
+        self._check_user_id = self._client.user_id_from_username(self._config.USERNAME)
 
 
     async def check_user(self, user_name: str) -> bool:

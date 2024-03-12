@@ -9,7 +9,7 @@ class BotConfig(BaseSettings):
         extra='ignore',
     )
 
-    TOKEN: str = 'bot_token'
+    TOKEN: str = '0000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
 
 
 class AppConfig(BaseSettings):
@@ -72,7 +72,6 @@ class InstagramConfig(BaseSettings):
 
     USERNAME: str = 'username'
     PASSWORD: str = 'password'
-    CHECK_USERNAME: str = ''
     SETTINGS_PATH: str = './social_networks_temp/instagram_settings.json'
 
 
