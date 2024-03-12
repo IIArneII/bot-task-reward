@@ -76,8 +76,23 @@ class InstagramConfig(BaseSettings):
     SETTINGS_PATH: str = './social_networks_temp/instagram_settings.json'
 
 
+class YouTubeConfig(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_prefix='SN_YT_',
+        env_file='.env',
+        extra='ignore',
+        use_enum_values=True,
+    )
+
+    USERNAME: str = 'username'
+    PASSWORD: str = 'password'
+    CHECK_USERNAME: str = ''
+    SETTINGS_PATH: str = './social_networks_temp/instagram_settings.json'
+
+
 class SNConfig(BaseSettings):
     instagram: InstagramConfig = InstagramConfig()
+    youtube: YouTubeConfig = YouTubeConfig()
 
 
 class Config(BaseSettings):

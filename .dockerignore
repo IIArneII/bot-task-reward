@@ -168,3 +168,4 @@ logs
 .gitignore
 .dockerignore
 Dockerfile
+social_networks_temp

@@ -10,6 +10,7 @@ from app.services.tasks import TasksService
 from app.infrastructure.social_network import ISocialNetwork
 from app.infrastructure.social_networks.instagram import Instagram
 from app.infrastructure.social_networks.twitter import Twitter
+from app.infrastructure.social_networks.youtube import YouTube
 
 
 class Container(DeclarativeContainer):
@@ -19,6 +20,7 @@ class Container(DeclarativeContainer):
     
     users_repository = Factory(UsersRepository, get_session=db.provided.get_session)
 
+    youtube: ISocialNetwork =Singleton(YouTube, config=config.sn.youtube)
     twitter: ISocialNetwork = Singleton(Twitter)
     instagram: ISocialNetwork = Singleton(Instagram, config=config.sn.instagram)
 
@@ -36,7 +38,8 @@ def init_container(config: Config) -> None:
     container = Container()
     container.config.from_dict(config.model_dump())
     container.db()
-    container.instagram()
+    # container.instagram()
+    container.youtube()
 
 
 def get_container() -> Container:
