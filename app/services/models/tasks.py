@@ -6,6 +6,7 @@ from app.services.models.base import BaseModel
 class SocialNetwork(str, Enum):
     instagram = 'instagram'
     twitter = 'twitter'
+    telegram = 'telegram'
 
 
 class Task(BaseModel):

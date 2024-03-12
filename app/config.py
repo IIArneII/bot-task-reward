@@ -76,7 +76,19 @@ class InstagramConfig(BaseSettings):
     SETTINGS_PATH: str = './social_networks_temp/instagram_settings.json'
 
 
+class TelegramConfig(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_prefix='SN_TELEGRAM_',
+        env_file='.env',
+        extra='ignore',
+        use_enum_values=True,
+    )
+
+    CHANNEL: str = '@channel_name'
+
+
 class SNConfig(BaseSettings):
+    telegram: TelegramConfig = TelegramConfig()
     instagram: InstagramConfig = InstagramConfig()
 
 

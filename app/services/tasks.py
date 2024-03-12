@@ -7,6 +7,13 @@ from app.services.models.users import UserUpdate
 
 
 tasks = {
+    'telegram.subscribe': Task(
+        social_network=SocialNetwork.telegram,
+        name='Подписаться на телеграм',
+        description='Вам необходимо подписаться на телеграм',
+        link='https://t.me/mango_arne',
+        bonuses=100,
+    ),
     'twitter.subscribe': Task(
         social_network=SocialNetwork.twitter,
         name='Подписаться на твиттер',
@@ -25,16 +32,25 @@ tasks = {
 
 
 class TasksService:
-    def __init__(self, users_repository: UsersRepository, twitter: ISocialNetwork, instagram: ISocialNetwork) -> None:
+    def __init__(
+            self,
+            users_repository: UsersRepository,
+            twitter: ISocialNetwork,
+            instagram: ISocialNetwork,
+            telegram: ISocialNetwork,
+        ) -> None:
         self._users_repository = users_repository
         self._twitter = twitter
         self._instagram = instagram
+        self._telegram = telegram
     
     def _get_social_network(self, name: SocialNetwork) -> ISocialNetwork:
         if name == SocialNetwork.twitter:
             return self._twitter
         if name == SocialNetwork.instagram:
             return self._instagram
+        if name == SocialNetwork.telegram:
+            return self._telegram
         raise UNKNOWN_SOCIAL_NETWORK
 
 
@@ -78,7 +94,7 @@ class TasksService:
 
 
     @try_except
-    def check_user_name(self, user_id: int, id: str, user_name: str) -> bool:
+    async def check_user_name(self, user_id: int, id: str, user_name: str) -> bool:
         task = tasks.get(id)
         if task is None:
             raise NOT_FOUND_ERR
@@ -92,11 +108,11 @@ class TasksService:
 
         social_network = self._get_social_network(task.social_network)
         
-        return not social_network.check_user(user_name)
+        return not await social_network.check_user(user_name)
 
 
     @try_except
-    def check_execution(self, user_id: int, id: str, user_name: str) -> bool:
+    async def check_execution(self, user_id: int, id: str, user_name: str) -> bool:
         task = tasks.get(id)
         if task is None:
             raise NOT_FOUND_ERR
@@ -109,7 +125,7 @@ class TasksService:
             raise ALREADY_DONE
 
         social_network = self._get_social_network(task.social_network)
-        if not social_network.check_user(user_name):
+        if not await social_network.check_user(user_name):
             return False
 
         user = self._users_repository.update(user.id, UserUpdate(

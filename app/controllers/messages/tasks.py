@@ -1,4 +1,5 @@
 from app.services.models.tasks import TaskForUser
+from app.services.models.tasks import SocialNetwork
 
 
 def tasks_msg() -> str:
@@ -9,6 +10,14 @@ def tasks_msg() -> str:
 
 
 def task_msg(task: TaskForUser) -> str:
+    end_text = 'Ты уже выполнил это задание!'
+    
+    if not task.is_done:
+        if task.social_network == SocialNetwork.telegram:
+            end_text = f'Ссылка на выполнение: {task.link}'
+        else:    
+            end_text = 'Отправь свое имя пользователя в этой социальной сети и мы вышлем ссылку на выполнение'
+
     return f'''
 {task.name}
 
@@ -16,7 +25,7 @@ def task_msg(task: TaskForUser) -> str:
 
 💎Будет получено {task.bonuses} бонусов
 
-{'Ты уже выполнил это задание!' if task.is_done else 'Отправь свое имя пользователя в этой социальной сети и мы вышлем ссылку на выполнение'}
+{end_text}
     '''
 
 
