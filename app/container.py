@@ -13,6 +13,7 @@ from app.infrastructure.social_network import ISocialNetwork
 from app.infrastructure.social_networks.instagram import Instagram
 from app.infrastructure.social_networks.twitter import Twitter
 from app.infrastructure.social_networks.telegram import Telegram
+from app.infrastructure.social_networks.discord import Discord
 
 
 class Container(DeclarativeContainer):
@@ -25,12 +26,19 @@ class Container(DeclarativeContainer):
     dispatcher: Dispatcher = Resource(init_dispatcher)
     bot: Bot = Resource(init_bot, config=config.bot)
 
+    discord: ISocialNetwork = Singleton(Discord, config=config.sn.discord)
     telegram: ISocialNetwork = Singleton(Telegram, config=config.sn.telegram, bot=bot)
     twitter: ISocialNetwork = Singleton(Twitter)
     instagram: ISocialNetwork = Singleton(Instagram, config=config.sn.instagram)
 
     users_service: UsersService = Factory(UsersService, users_repository=users_repository)
-    tasks_service: TasksService = Factory(TasksService, users_repository=users_repository, twitter=twitter, instagram=instagram, telegram=telegram)
+    tasks_service: TasksService = Factory(
+        TasksService,
+        users_repository=users_repository,
+        twitter=twitter, instagram=instagram,
+        telegram=telegram,
+        discord=discord,
+    )
 
 
 container : Container | None = None
@@ -48,6 +56,7 @@ async def init_container(config: Config) -> Container:
     container.db()
     container.instagram()
     container.telegram()
+    container.discord()
 
     return container
 

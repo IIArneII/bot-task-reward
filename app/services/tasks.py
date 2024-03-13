@@ -7,6 +7,13 @@ from app.services.models.users import UserUpdate
 
 
 tasks = {
+    'discord.subscribe': Task(
+        social_network=SocialNetwork.discord,
+        name='Вступить в дискорд',
+        description='Вам необходимо присоединиться к серверу в дискорде',
+        link='https://discord.gg/X2WsFPHHq9',
+        bonuses=100,
+    ),
     'telegram.subscribe': Task(
         social_network=SocialNetwork.telegram,
         name='Подписаться на телеграм',
@@ -38,11 +45,13 @@ class TasksService:
             twitter: ISocialNetwork,
             instagram: ISocialNetwork,
             telegram: ISocialNetwork,
+            discord: ISocialNetwork,
         ) -> None:
         self._users_repository = users_repository
         self._twitter = twitter
         self._instagram = instagram
         self._telegram = telegram
+        self._discord = discord
     
     def _get_social_network(self, name: SocialNetwork) -> ISocialNetwork:
         if name == SocialNetwork.twitter:
@@ -51,6 +60,8 @@ class TasksService:
             return self._instagram
         if name == SocialNetwork.telegram:
             return self._telegram
+        if name == SocialNetwork.discord:
+            return self._discord
         raise UNKNOWN_SOCIAL_NETWORK
 
 
