@@ -86,7 +86,20 @@ class TelegramConfig(BaseSettings):
     CHANNEL: str = '@channel_name'
 
 
+class DiscordConfig(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_prefix='SN_DISCORD_',
+        env_file='.env',
+        extra='ignore',
+        use_enum_values=True,
+    )
+
+    TOKEN: str = 'AAAAAAAAAAAAAAAAAAAAAAAA.AAAAAA.AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
+    GUILD: int = 1
+
+
 class SNConfig(BaseSettings):
+    discord: DiscordConfig = DiscordConfig()
     telegram: TelegramConfig = TelegramConfig()
     instagram: InstagramConfig = InstagramConfig()
 

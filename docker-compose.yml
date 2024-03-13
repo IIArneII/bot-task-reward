@@ -41,6 +41,8 @@ services:
       SN_INST_USERNAME: ${SN_INST_USERNAME}
       SN_INST_PASSWORD: ${SN_INST_PASSWORD}
       SN_TELEGRAM_CHANNEL: ${SN_TELEGRAM_CHANNEL}
+      SN_DISCORD_GUILD: ${SN_DISCORD_GUILD}
+      SN_DISCORD_TOKEN: ${SN_DISCORD_TOKEN}
     volumes:
       - ${LOG_DIR:-./logs}:/app/logs
       - ${SOCIAL_NETWORKS_TEMP:-./social_networks_temp}:/app/social_networks_temp

@@ -7,6 +7,7 @@ class SocialNetwork(str, Enum):
     instagram = 'instagram'
     twitter = 'twitter'
     telegram = 'telegram'
+    discord = 'discord'
 
 
 class Task(BaseModel):
