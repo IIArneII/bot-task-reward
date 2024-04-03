@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from app.services.models.tasks import TaskForUser
+from app.services.models.tasks import TaskForUser, Status
 
 
 back_to_tasks_kb = InlineKeyboardMarkup(inline_keyboard=[
@@ -17,8 +17,13 @@ check_kb = InlineKeyboardMarkup(inline_keyboard=[
 def tasks_kb(tasks: list[TaskForUser]) -> InlineKeyboardMarkup:
     keyboard = []
     for i in tasks:
-        is_done = '✅' if i.is_done else '❗'
-        keyboard.append([InlineKeyboardButton(text=f'{is_done}{i.name}', callback_data=f'tasks_{i.id}')])
+        status = '❗'
+        if i.status == Status.completed:
+            status = '✅'
+        elif i.status == Status.waiting_for_confirmation:
+            status = '⌛'
+
+        keyboard.append([InlineKeyboardButton(text=f'{status}{i.name}', callback_data=f'tasks_{i.id}')])
     
     keyboard.append([InlineKeyboardButton(text='🔙В меню', callback_data='menu')])
     return InlineKeyboardMarkup(inline_keyboard=keyboard)

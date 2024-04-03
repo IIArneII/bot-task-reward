@@ -1,6 +1,3 @@
-from app.services.models.users import UserCreate, User
-
-
 def error_msg(error: str | None) -> str:
     if error:
         return f'''

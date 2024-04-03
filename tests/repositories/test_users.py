@@ -1,5 +1,6 @@
 from app.repositories.users import UsersRepository
 from app.services.models.users import User, UserCreate, UserUpdate
+from app.services.models.tasks import TaskStatus, Status
 from app.services.models.errors import AlreadyExistsError
 
 from pytest import raises
@@ -58,7 +59,7 @@ class TestUpdate:
 
         user_update = UserUpdate(
             balance=10,
-            tasks=['1'],
+            tasks=[TaskStatus(id='1', status=Status.completed)],
         )
 
         created_user.balance = user_update.balance
@@ -79,7 +80,7 @@ class TestUpdate:
 
         user_update = UserUpdate(
             balance=10,
-            tasks=['1'],
+            tasks=[TaskStatus(id='1', status=Status.completed, screenshot_path='1')],
         )
 
         created_user.balance = user_update.balance
@@ -126,3 +127,31 @@ class TestUpdate:
         assert updated_user.updated_at >= created_user.updated_at
         created_user.updated_at = updated_user.updated_at
         assert updated_user.model_dump() == created_user.model_dump()
+
+
+class TestGetWaitingForConfirmation:
+    def test_get(self, users_repo: UsersRepository, clean_db):
+        new_user1 = UserCreate(id=1)
+        new_user2 = UserCreate(id=2)
+
+        users_repo.create(new_user1)
+        users_repo.create(new_user2)
+
+        user_update = UserUpdate(
+            tasks=[TaskStatus(id='1', status=Status.waiting_for_confirmation, screenshot_path='1')],
+        )
+
+        new_user1 = users_repo.update(new_user1.id, user_update)
+
+        user = users_repo.get_waiting_for_confirmation()
+        assert user.model_dump() == new_user1.model_dump()
+
+    def test_get_empty(self, users_repo: UsersRepository, clean_db):
+        new_user1 = UserCreate(id=1)
+        new_user2 = UserCreate(id=2)
+
+        users_repo.create(new_user1)
+        users_repo.create(new_user2)
+
+        user = users_repo.get_waiting_for_confirmation()
+        assert user is None

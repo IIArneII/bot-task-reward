@@ -1,6 +1,7 @@
 from enum import Enum 
 
 from app.services.models.base import BaseModel, EntityBaseModel
+from app.services.models.tasks import TaskStatus
 
 
 class Role(str, Enum):
@@ -11,7 +12,7 @@ class Role(str, Enum):
 class User(EntityBaseModel):
     balance: int
     role: Role
-    tasks: list[str]
+    tasks: list[TaskStatus]
 
 
 class UserCreate(BaseModel):
@@ -20,4 +21,4 @@ class UserCreate(BaseModel):
 
 class UserUpdate(BaseModel):
     balance: int | None = None
-    tasks: list[str] | None = None
+    tasks: list[TaskStatus] | None = None

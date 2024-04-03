@@ -173,3 +173,4 @@ docker-compose.yml
 README.md
 pytest.ini
 tests/
+files/

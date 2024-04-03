@@ -1,5 +1,6 @@
 from asyncio import run
 from loguru import logger
+import aiofiles
 
 from app.app import create_app
 from app.config import Config

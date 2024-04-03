@@ -1,12 +1,12 @@
 from app.db.models.user import User as UserDB
 from app.services.models.users import User, UserCreate, UserUpdate
-from app.services.models.base import Page
+from app.services.models.tasks import Status
 from app.services.models.errors import ALREADY_EXISTS
-from app.repositories.helpers.page import build_page
 
 
 from sqlalchemy.orm.session import Session
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import cast, String
 from typing import Callable
 from datetime import datetime, timezone
 
@@ -22,6 +22,12 @@ class UsersRepository:
 
             return User.model_validate(user) if user else None
 
+    def get_waiting_for_confirmation(self) -> User:
+        with self._get_session() as session:
+
+            user = session.query(UserDB).where(cast(UserDB.tasks, String).ilike(f'%{Status.waiting_for_confirmation}%')).order_by(UserDB.updated_at.desc()).first()
+
+            return User.model_validate(user) if user else None
 
     def create(self, model: UserCreate) -> User:
         try:
@@ -48,7 +54,7 @@ class UsersRepository:
                     user.balance = model.balance
                 
                 if type(model.tasks) is list:
-                    user.tasks = model.tasks
+                    user.tasks = [s.model_dump() for s in model.tasks]
 
                 user.updated_at = datetime.now(timezone.utc)
 

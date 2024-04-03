@@ -1,5 +1,5 @@
 from app.services.models.tasks import TaskForUser
-from app.services.models.tasks import SocialNetwork
+from app.services.models.tasks import SocialNetwork, Status
 
 
 def tasks_msg() -> str:
@@ -12,11 +12,16 @@ def tasks_msg() -> str:
 def task_msg(task: TaskForUser) -> str:
     end_text = 'Ты уже выполнил это задание!'
     
-    if not task.is_done:
-        if task.social_network == SocialNetwork.telegram:
+    if task.status == Status.not_completed:
+        if SocialNetwork.is_telegram(task.social_network):
             end_text = f'Ссылка на выполнение: {task.link}'
+        elif SocialNetwork.for_screenshot(task.social_network):
+            end_text = f'Ссылка на выполнение: {task.link}. Отправь скриншот, подтверждающий выполнение'
         else:    
             end_text = 'Отправь свое имя пользователя в этой социальной сети и мы вышлем ссылку на выполнение'
+    
+    elif task.status == Status.waiting_for_confirmation:
+        end_text = 'Ожидай подтверждения'
 
     return f'''
 {task.name}
@@ -52,4 +57,9 @@ def successful_check_msg(task: TaskForUser) -> str:
 def failed_check_msg() -> str:
     return f'''
 Кажется, вы не выполнили задание😞
+'''
+
+def screenshot_answer_msg() -> str:
+    return f'''
+Отлично! Потребуется некоторое время, чтобы мы проверили выполнение
 '''
