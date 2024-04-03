@@ -43,6 +43,16 @@ class DBConfig(BaseSettings):
         return f"postgresql://{self.USER}@{self.HOST}:{self.PORT}/{self.NAME}"
 
 
+class FMConfig(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_prefix='FM_',
+        env_file='.env',
+        extra='ignore',
+    )
+
+    DIR: str = './files'
+
+
 class LogConfig(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix='LOG_',
@@ -110,3 +120,4 @@ class Config(BaseSettings):
     db:  DBConfig  = DBConfig()
     log: LogConfig = LogConfig()
     sn: SNConfig = SNConfig()
+    fm: FMConfig = FMConfig()

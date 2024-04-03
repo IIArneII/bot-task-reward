@@ -23,7 +23,7 @@ async def start(msg: Message):
 
         user = users_service.register(UserCreate(id=msg.from_user.id))
 
-        await msg.answer(menu_msg(user, msg.from_user.full_name), reply_markup=menu_kb)
+        await msg.answer(menu_msg(user, msg.from_user.full_name), reply_markup=menu_kb(user))
 
     except Exception as e:
         logger.exception(e)
@@ -49,7 +49,7 @@ async def menu(clbck: CallbackQuery, state: FSMContext):
 
         await state.clear()
 
-        await clbck.message.answer(menu_msg(user, clbck.from_user.full_name), reply_markup=menu_kb)
+        await clbck.message.answer(menu_msg(user, clbck.from_user.full_name), reply_markup=menu_kb(user))
     
     except Exception as e:
         logger.exception(e)

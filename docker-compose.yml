@@ -45,4 +45,5 @@ services:
       SN_DISCORD_TOKEN: ${SN_DISCORD_TOKEN}
     volumes:
       - ${LOG_DIR:-./logs}:/app/logs
+      - ${FM_DIR:-./files}:/app/files
       - ${SOCIAL_NETWORKS_TEMP:-./social_networks_temp}:/app/social_networks_temp

@@ -35,9 +35,11 @@ def init_dispatcher() -> Dispatcher:
 
     from app.controllers.base import base_router
     from app.controllers.tasks import tasks_router
+    from app.controllers.admin import admin_router
 
     dp = Dispatcher(storage=MemoryStorage())
     dp.include_router(base_router)
     dp.include_router(tasks_router)
+    dp.include_router(admin_router)
 
     return dp

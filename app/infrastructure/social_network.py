@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 
 class ISocialNetwork(ABC):
     async def check_user(self, user_name: str) -> bool:

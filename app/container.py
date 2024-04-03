@@ -9,6 +9,7 @@ from app.repositories.users import UsersRepository
 from app.services.users import UsersService
 from app.services.tasks import TasksService
 from app.bot import init_bot, init_dispatcher
+from app.infrastructure.file_manager import FileManager
 from app.infrastructure.social_network import ISocialNetwork
 from app.infrastructure.social_networks.instagram import Instagram
 from app.infrastructure.social_networks.twitter import Twitter
@@ -30,6 +31,7 @@ class Container(DeclarativeContainer):
     telegram: ISocialNetwork = Singleton(Telegram, config=config.sn.telegram, bot=bot)
     twitter: ISocialNetwork = Singleton(Twitter)
     instagram: ISocialNetwork = Singleton(Instagram, config=config.sn.instagram)
+    file_manager: FileManager = Singleton(FileManager, config=config.fm)
 
     users_service: UsersService = Factory(UsersService, users_repository=users_repository)
     tasks_service: TasksService = Factory(
@@ -38,6 +40,7 @@ class Container(DeclarativeContainer):
         twitter=twitter, instagram=instagram,
         telegram=telegram,
         discord=discord,
+        file_manager=file_manager,
     )
 
 
@@ -52,11 +55,12 @@ async def init_container(config: Config) -> Container:
     container.config.from_dict(config.model_dump())
 
     container.dispatcher()
-    b = await container.bot()
+    await container.bot()
     container.db()
     container.instagram()
     container.telegram()
     container.discord()
+    container.file_manager()
 
     return container
 

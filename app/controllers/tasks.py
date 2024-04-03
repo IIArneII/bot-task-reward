@@ -6,11 +6,11 @@ from loguru import logger
 
 from app.controllers.keyboards.menu import back_to_menu_kb
 from app.controllers.keyboards.tasks import tasks_kb, back_to_tasks_kb, check_kb
-from app.controllers.messages.tasks import tasks_msg, task_msg, task_successful_user_name_msg, task_failed_user_name_msg, successful_check_msg, failed_check_msg
+from app.controllers.messages.tasks import tasks_msg, task_msg, task_successful_user_name_msg, task_failed_user_name_msg, successful_check_msg, failed_check_msg, screenshot_answer_msg
 from app.controllers.messages.error import error_msg
 from app.controllers.states.completing_task import CompletingTask
 from app.services.tasks import TasksService
-from app.services.models.tasks import SocialNetwork
+from app.services.models.tasks import SocialNetwork, Status
 from app.container import get_container
 
 
@@ -39,16 +39,22 @@ async def task(clbck: CallbackQuery, state: FSMContext):
         task = tasks_service.get(clbck.from_user.id, clbck.data[6:])
 
         await state.clear()
+        kb = back_to_tasks_kb
 
-        if not task.is_done:
+        if task.status == Status.not_completed:
             await state.update_data(task_id=task.id)
 
-            if task.social_network == SocialNetwork.telegram:
+            if SocialNetwork.is_telegram(task.social_network):
+                kb = check_kb
                 await state.set_state(CompletingTask.telegram_task)
+            
+            elif SocialNetwork.for_screenshot(task.social_network):
+                await state.set_state(CompletingTask.screenshot_task)
+            
             else:
-                await state.set_state(CompletingTask.user_name)
+                await state.set_state(CompletingTask.user_name_task)
 
-        await clbck.message.answer(task_msg(task), reply_markup=check_kb if task.social_network == SocialNetwork.telegram and not task.is_done else back_to_tasks_kb)
+        await clbck.message.answer(task_msg(task), reply_markup=kb)
     
     except Exception as e:
         logger.exception(e)
@@ -78,7 +84,23 @@ async def telegram_task(clbck: CallbackQuery, state: FSMContext):
         await clbck.message.answer(error_msg(str(e)), reply_markup=back_to_menu_kb)
 
 
-@tasks_router.message(CompletingTask.user_name)
+@tasks_router.message(CompletingTask.screenshot_task, F.photo)
+async def save_screenshot(message: Message, state: FSMContext):
+    try:
+        tasks_service: TasksService = await get_container().tasks_service()
+
+        data = await state.get_data()
+
+        await tasks_service.save_screenshot(message.from_user.id, data['task_id'], message.photo[-1].file_id)
+
+        await message.answer(screenshot_answer_msg(), reply_markup=back_to_menu_kb)
+
+    except Exception as e:
+        logger.exception(e)
+        await message.answer(error_msg(str(e)), reply_markup=back_to_menu_kb)
+
+
+@tasks_router.message(CompletingTask.user_name_task)
 async def user_name(message: Message, state: FSMContext):
     try:
         tasks_service: TasksService = await get_container().tasks_service()
